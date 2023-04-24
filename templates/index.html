@@ -20,21 +20,11 @@
 			<button type="button" id="add-character" class="btn btn-secondary">인물 추가</button>
 			<div id="characters-container"></div>
 
-			<h2>시놉시스와 분량</h2>
+			<h2>시놉시스</h2>
 			<div class="form-group">
-				<label for="novel-synopsis">시놉시스:</label>
+				<label for="novel-synopsis">줄거리:</label>
 				<textarea class="form-control" id="novel-synopsis" rows="3"
-					placeholder="시놉시스를 입력하세요."></textarea>
-			</div>
-			<div class="form-group">
-				<label for="novel-length">소설 전체 분량 (페이지 단위):</label>
-				<input type="number" class="form-control" id="novel-length"
-					placeholder="분량을 페이지 단위로 입력하세요.">
-			</div>
-			<div class="form-group">
-				<label for="conversation-length">대화 분량 (라인 단위):</label>
-				<input type="number" class="form-control" id="conversation-length"
-					placeholder="분량을 라인 단위로 입력하세요.">
+					placeholder="줄거리를 입력하세요."></textarea>
 			</div>
 			<button type="submit" class="btn btn-primary">대화 생성하기</button>
 		</form>
@@ -44,9 +34,8 @@
 			<span class="sr-only">Loading...</span>
 		</div>
 
-		<pre id="generated-conversation" class="alert alert-info" role="alert">
-			생성된 대화는 이곳에 표시됩니다.
-		</pre>
+		<pre id="generated-conversation" class="alert alert-info text-break"
+			role="alert">생성된 대화는 이곳에 표시됩니다.</pre>
 	</div>
 
 	<script>
@@ -96,12 +85,8 @@ Character Background: ${characterBackground}\n`;
 			});
 
 			let novelSynopsis = $('#novel-synopsis').val();
-			let novelLength = $('#novel-length').val();
-			let conversationLength = $('#novel-length').val();
 
 			prompt += `\nNovel Synopsis: ${novelSynopsis}\n
-			Novel Length: ${novelLength} pages\n
-			Maximum length of this Conversation: ${conversationLength} lines\n
 			Conversation should not exceed the limit of lines requested.
 			\nConversation:\n`;
 
