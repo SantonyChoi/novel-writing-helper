@@ -27,9 +27,14 @@
 					placeholder="시놉시스를 입력하세요."></textarea>
 			</div>
 			<div class="form-group">
-				<label for="novel-length">분량 (페이지 단위):</label>
+				<label for="novel-length">소설 전체 분량 (페이지 단위):</label>
 				<input type="number" class="form-control" id="novel-length"
 					placeholder="분량을 페이지 단위로 입력하세요.">
+			</div>
+			<div class="form-group">
+				<label for="conversation-length">대화 분량 (라인 단위):</label>
+				<input type="number" class="form-control" id="conversation-length"
+					placeholder="분량을 라인 단위로 입력하세요.">
 			</div>
 			<button type="submit" class="btn btn-primary">대화 생성하기</button>
 		</form>
@@ -92,10 +97,13 @@ Character Background: ${characterBackground}\n`;
 
 			let novelSynopsis = $('#novel-synopsis').val();
 			let novelLength = $('#novel-length').val();
+			let conversationLength = $('#novel-length').val();
 
 			prompt += `\nNovel Synopsis: ${novelSynopsis}\n
-Novel Length: ${novelLength} pages\n
-\nConversation:\n`;
+			Novel Length: ${novelLength} pages\n
+			Maximum length of this Conversation: ${conversationLength} lines\n
+			Conversation should not exceed the limit of lines requested.
+			\nConversation:\n`;
 
 			// Call the OpenAI API
 			$.ajax({
