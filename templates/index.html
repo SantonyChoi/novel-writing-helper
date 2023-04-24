@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>OpenAI API Novel Writing Helper</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+	<div class="container">
+		<h1 class="text-center">인물간 대화 생성기</h1>
+		<form id="novel-form">
+			<h2>인물 정보</h2>
+			<button type="button" id="add-character" class="btn btn-secondary">인물 추가</button>
+			<div id="characters-container"></div>
+
+			<h2>시놉시스와 분량</h2>
+			<div class="form-group">
+				<label for="novel-synopsis">시놉시스:</label>
+				<textarea class="form-control" id="novel-synopsis" rows="3"
+					placeholder="시놉시스를 입력하세요."></textarea>
+			</div>
+			<div class="form-group">
+				<label for="novel-length">분량 (페이지 단위):</label>
+				<input type="number" class="form-control" id="novel-length"
+					placeholder="분량을 페이지 단위로 입력하세요.">
+			</div>
+			<button type="submit" class="btn btn-primary">대화 생성하기</button>
+		</form>
+		<hr>
+		<h2>생성된 대화내용</h2>
+		<div class="spinner-border text-primary d-none" id="loading-spinner" role="status">
+			<span class="sr-only">Loading...</span>
+		</div>
+
+		<pre id="generated-conversation" class="alert alert-info" role="alert">
+			생성된 대화는 이곳에 표시됩니다.
+		</pre>
+	</div>
+
+	<script>
+		// Replace this with your actual API key
+		const OPENAI_API_KEY = '';
+
+		// Replace this with the appropriate GPT-3.5 API endpoint
+		const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
+
+		function createCharacterSlot(index) {
+			return `
+				<div class="character-slot" data-index="${index}">
+				<hr>
+				<h3>인물 ${index + 1}</h3>
+				<div class="form-group">
+					<label for="character-name-${index}">이름:</label>
+					<input type="text" class="form-control" id="character-name-${index}" placeholder="이름을 입력하세요.">
+				</div>
+				<div class="form-group">
+					<label for="character-personalities-${index}">성격:</label>
+					<input type="text" class="form-control" id="character-personalities-${index}" placeholder="성격을 서술하세요.">
+				</div>
+				<div class="form-group">
+					<label for="character-background-${index}">배경 정보:</label>
+					<textarea class="form-control" id="character-background-${index}" rows="3" placeholder="인물의 배경을 설정하세요."></textarea>
+				</div>
+				</div>
+			`;
+		}
+
+
+		function generateConversation() {
+			$('#generated-conversation').text('');
+			$('#loading-spinner').removeClass('d-none');
+			let prompt = 'Create a conversation between characters in a novel with the following details:\n';
+
+			$('.character-slot').each(function () {
+				let index = $(this).data('index');
+				let characterName = $(`#character-name-${index}`).val();
+				let characterPersonalities = $(`#character-personalities-${index}`).val();
+				let characterBackground = $(`#character-background-${index}`).val();
+
+				prompt += `\nCharacter ${index + 1}:\n
+Character Name: ${characterName}\n
+Character Personalities: ${characterPersonalities}\n
+Character Background: ${characterBackground}\n`;
+			});
+
+			let novelSynopsis = $('#novel-synopsis').val();
+			let novelLength = $('#novel-length').val();
+
+			prompt += `\nNovel Synopsis: ${novelSynopsis}\n
+Novel Length: ${novelLength} pages\n
+\nConversation:\n`;
+
+			// Call the OpenAI API
+			$.ajax({
+				type: 'POST',
+				url: '/api/generate-conversation',
+				contentType: 'application/json',
+				data: JSON.stringify({ prompt: prompt }),
+				success: function (response) {
+					// Hide the spinner
+					$('#loading-spinner').addClass('d-none');
+
+					let generatedText = response.result;
+					$('#generated-conversation').text(generatedText);
+				},
+				error: function (xhr, status, error) {
+					// Hide the spinner
+					$('#loading-spinner').addClass('d-none');
+
+					console.error('Error calling server-side API:', error);
+					$('#generated-conversation').text('Error generating conversation. Please try again.');
+				}
+			});
+		}
+
+		// Attach event handler
+		$('#novel-form').on('submit', function (event) {
+			event.preventDefault();
+			generateConversation();
+		});
+
+		// Initialize the first character slot
+		let characterIndex = 0;
+		$('#characters-container').append(createCharacterSlot(characterIndex));
+
+		// Attach event handler to "Add Character" button
+		$('#add-character').on('click', function () {
+			characterIndex++;
+			$('#characters-container').append(createCharacterSlot(characterIndex));
+		});
+
+	</script>
+</body>
+
+</html>
